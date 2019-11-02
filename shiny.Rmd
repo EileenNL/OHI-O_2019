@@ -9,8 +9,11 @@ runtime: shiny
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
-library(ggplot)
+library(lubridate)
+library(ggrepel)
+library(data.table)
 library(dplyr)
+library(ggmap)
 
 setwd("C:/Users/cpere/OneDrive/Documents/hackio19")
 ```
@@ -67,6 +70,22 @@ It's also possible to embed an entire Shiny application within an R Markdown doc
 
 ```{r tabsets, echo=FALSE}
 electricity = hack2019%>%filter(hack2019$Resource == "Electricity")
+electricity_id = (electricity$`meeter ID`)
+
+id1 = electricity_id[1]
+id1 = droplevels(id1)
+id1 = toString(id1)
+meterData = filter(HackathonDataDaily, meterID == id1)
+dataSize = dim(meterData)
+avgValue = (meterData[dataSize[1], 2] - meterData[1,2])/dataSize[1]
+avgElectricityData [1,1] = id1
+avgElectricityData [1,2] = avgValue
+
+```
+
+
+```{r}
+water = hack2019%>%filter(hack2019$Resource != "Electricity")
 ```
 
 Note the use of the `height` parameter to determine how much vertical space the embedded application should occupy.
@@ -76,4 +95,26 @@ You can also use the `shinyApp` function to define an application inline rather 
 In all of R code chunks above the `echo = FALSE` attribute is used. This is to prevent the R code within the chunk from rendering in the document alongside the Shiny components.
 
 
+```{r}
+
+APIkey1 = "AIzaSyBOzqqYlh8T2v9Km7TDjoIAFVq1U3CH4Bw"
+register_google(key = APIkey1)
+map = ggmap(
+  ggmap = get_map(
+    location = "OSU Horseshoe,columbus,ohio",
+     zoom = 15, scale = 4,
+     maptype = "satellite",
+     source = "google"),
+  extent = "device",
+  legend = "topright"
+  )
+#map + geom_point(aes(x = hack2019$Longitude, y = hack2019$Latitude, colors = hack2019$Resource), data = hack2019, alpha = .5, color="blue")+scale_size(range=c(1,20))
+
+map + geom_point(aes(x = electricity$Longitude, y = electricity$Latitude, colors = electricity$Resource), data = electricity, alpha = .5, color="yellow")+scale_size(range=c(1,20))
+```
+
+
+```{r}
+map + geom_point(aes(x = water$Longitude, y = water$Latitude, colors = water$Resource), data = water, alpha = .5, color="red")+scale_size(range=c(1,20))
+```
 
