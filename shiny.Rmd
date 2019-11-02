@@ -1,0 +1,79 @@
+---
+title: "Untitled"
+author: "Cristina Perez Diukina"
+date: "November 2, 2019"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(ggplot)
+library(dplyr)
+
+setwd("C:/Users/cpere/OneDrive/Documents/hackio19")
+```
+
+This R Markdown document is made interactive using Shiny. Unlike the more traditional workflow of creating static reports, you can now create documents that allow your readers to change the assumptions underlying your analysis and see the results immediately. 
+
+To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
+
+## Inputs and Outputs
+
+You can embed Shiny inputs and outputs in your document. Outputs are automatically updated whenever inputs change.  This demonstrates how a standard R plot can be made interactive by wrapping it in the Shiny `renderPlot` function. The `selectInput` and `sliderInput` functions create the input widgets used to drive the plot.
+
+```{r eruptions, echo=FALSE}
+numericInput("rows", "How many rows?", 5)
+
+
+
+hack2019 = read.csv("hack2019.csv")
+names(hack2019) <- c("Building ID","meeter ID","Description","Units","Resource","Building Name","Gross Square feet","Build Date","Latitude","Longitude","Campus","Ognanization","Location Type","Steam Source ID","ChilledWSID","HotWTSID","ActivationDate")
+HackathonDataDaily = read.csv("HackathonDataDaily.csv")
+Hackathon_Data_Hourly2 = read.csv("HackathonDataHourly2of2.csv")
+Hackathon_Data_Hourly1 = read.csv("HackathonDataHourly1of2.csv")
+
+names(HackathonDataDaily) = c("meterID", "CurrentValue", "ValueString","Time","BuildingName","Units","Status","StatusCode")
+names(Hackathon_Data_Hourly2) = c("meterID", "CurrentValue", "ValueString","Time","BuildingName","Units","Status","StatusCode")
+names(Hackathon_Data_Hourly1) = c("meterID", "CurrentValue", "ValueString","Time","BuildingName","Units","Status","StatusCode")
+
+x1 = hack2019$X1102[,4]
+
+renderTable({
+  head(hack2019, input$rows)
+})
+
+
+
+#renderTable({
+# head(Hackathon_Data_Hourly1, input$rows)
+#})
+
+#renderTable({
+#  head(Hackathon_Data_Hourly2, input$rows)
+#})
+
+#renderTable({
+# head(HackathonDataDaily, input$rows)
+#})
+
+
+```
+
+## Embedded Application
+
+It's also possible to embed an entire Shiny application within an R Markdown document using the `shinyAppDir` function. This example embeds a Shiny application located in another directory:
+
+```{r tabsets, echo=FALSE}
+electricity = hack2019%>%filter(hack2019$Resource == "Electricity")
+```
+
+Note the use of the `height` parameter to determine how much vertical space the embedded application should occupy.
+
+You can also use the `shinyApp` function to define an application inline rather then in an external directory.
+
+In all of R code chunks above the `echo = FALSE` attribute is used. This is to prevent the R code within the chunk from rendering in the document alongside the Shiny components.
+
+
+
