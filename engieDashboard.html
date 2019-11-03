@@ -9,6 +9,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
   
   <style>
+
   hr {
 width: 75%;
 height: 5px;
@@ -54,6 +55,109 @@ border-color: black;
       }
       .row.content {height:auto;} 
     }
+    
+            .slider-holder
+        {
+            width: 800px;
+            height: 400px;
+            background-color: yellow;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 0px;
+            text-align: center;
+            overflow: hidden;
+        }
+       
+        .image-holder
+        {
+            width: 2400px;
+            background-color: red;
+            height: 400px;
+            clear: both;
+            position: relative;
+           
+            -webkit-transition: left 2s;
+            -moz-transition: left 2s;
+            -o-transition: left 2s;
+            transition: left 2s;
+        }
+       
+        .slider-image
+        {
+            float: left;
+            margin: 0px;
+            padding: 0px;
+            position: relative;
+        }
+       
+        #slider-image-1:target ~ .image-holder
+        {
+            left: 0px;
+        }
+       
+        #slider-image-2:target ~ .image-holder
+        {
+            left: -800px;
+        }
+       
+        #slider-image-3:target ~ .image-holder
+        {
+            left: -1600px;
+        }
+       
+        .button-holder
+        {
+            position: relative;
+            top: -20px;
+        }
+       
+        .slider-change
+        {
+            display: inline-block;
+            height: 10px;
+            width: 10px;
+            border-radius: 5px;
+            background-color: brown;
+        }
+        
+        .slidecontainer {
+  width: 100%; /* Width of the outside container */
+}
+
+/* The slider itself */
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 25px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
   </style>
 </head>
 <body>
@@ -66,13 +170,22 @@ border-color: black;
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <div style="text-align: left">
-      <a><img src="logo.png" width="50" height="50"></a>
-      </div>
+      <a class="navbar-brand" href="#"><img src="logo.png" width="30" height="30"></a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">About</a></li>
+        <li><a href="#">Daily Usage</a></li>
+        <li><a href="#">New Vs. Old</a></li>
+        <li><a href="#">Year Built</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#"></a></li>
+      </ul>
     </div>
   </div>
 </nav>
-  
+
 <div class="container-fluid text-center">    
   <div class="row content">
     <div class="col-sm-1 sidenav">
@@ -81,14 +194,18 @@ border-color: black;
     </div>
     <div class="col-sm-10 text-left"> 
       <h1><center>Hack OHI/O 2019 Engie Challenge</center></h1>
-      <p><center>A University the size of Ohio State can consume a lot more resources than one would imagine, but how much does it actually use? This dashboard visualizes just how much electricity and water gets consumed, as well as compares the consumption of old buildings versus new buildings.</center></p>
+      <p><center>A University the size of Ohio State can consume a lot more resources 
+      than one would imagine, but how much does it actually use? This dashboard visualizes
+       just how much electricity and non-electric resources gets consumed, as well as compares 
+       the consumption of old buildings versus new buildings.</center></p>
       <hr>
       <div class="row">
       <div class="col-sm-10 text-center"> 
       
       <p></p>
       </div>    
-      </div>    
+      </div>  
+       
       
  <div class="container-fluid text-center">
   <div class="row">
@@ -100,18 +217,26 @@ border-color: black;
     <h3><b>Relative Average Usage Per Day</b></h3>
     <div class="col-sm-5">
       <h3>Electricity Consumption</h3>
-      <div style="text-align: center"><img src="elec.png" width= "600" height = "500" >
+      <div style="text-align: center"><img src="elec.png" width= "600" height = "500">
       </div>
+      <div class="slidecontainer">
+  <input type="range" min="" max="2019" value="50" class="slider" id="myRange">
+  
+</div>
     </div>
     
     <div class="col-sm-5">
       <h3>Non-Electric Consumption</h3>
      <div style="text-align: center"><img src="waterCon.png" width= "600" height = "500">
      </div> 
+     <div class="slidecontainer">
+     <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+      </div>
     </div>   
   </div>
 </div>
   </div>
+</div>
 </div>
 </div>
 
@@ -139,11 +264,42 @@ border-color: black;
       <h3>Electric Consumption For Academic Buildings</h3>
       <div style="text-align: center"><img src="academicComp.png" width= "600" height = "500" >
       </div>
+       <select>
+  <option>CBEC</option>
+  <option>Enerson</option>
+  <option>Scott Lab</option>
+  <option>Sullivent</option>
+</select>
+  <select>
+  <option>Orton</option>
+  <option>Dreese</option>
+  <option>Hagerty</option>
+  <option>Caldwell</option>
+</select> 
     </div>
+    
     
     <div class="col-sm-5">
       <h3>Electric Consumption For Student Housing Buildings</h3>
      <div style="text-align: center"><img src="studentHouse.png" width= "600" height = "500" >
+     </div>
+ <select>
+  <option>Blackburn</option>
+  <option>Scott</option>
+  <option>Rainy</option>
+  <option>Park-Stradly</option>
+</select>
+  <select>
+  <option>Siebert</option>
+  <option>Houck</option>
+  <option>Norton</option>
+  <option>Mack</option>
+</select> 
+    </div> 
+    
+        <div class="col-sm-5">
+      <h3>Comparison of Buildings built before and After 2000</h3>
+     <div style="text-align: center"><img src="campusYear.png" width= "700" height = "500" >
      </div> 
     </div>   
   </div>
