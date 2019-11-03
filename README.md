@@ -1,4 +1,4 @@
-# OHI-O_2019
+# OHI/O 2019
 Ohio State 2019 Hackathon
 
 For the 2019 OHI/O Hackathon my team and I tackled the company, Engie's Challegne which called for us to create a dashboard displaying energy data from the 490 buildings at Ohio State by taking in multiple csv files with raw data from meters placed around campus.
