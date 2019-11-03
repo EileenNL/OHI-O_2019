@@ -15,6 +15,7 @@ library(data.table)
 library(dplyr)
 library(ggmap)
 
+
 setwd("C:/Users/cpere/OneDrive/Documents/hackio19")
 ```
 
@@ -32,20 +33,20 @@ numericInput("rows", "How many rows?", 5)
 
 
 hack2019 = read.csv("hack2019.csv")
-names(hack2019) <- c("Building ID","meeter ID","Description","Units","Resource","Building Name","Gross Square feet","Build Date","Latitude","Longitude","Campus","Ognanization","Location Type","Steam Source ID","ChilledWSID","HotWTSID","ActivationDate")
+names(hack2019) <- c("Building ID","meterID","Description","Units","Resource","Building Name","GrossSquarefeet","Build Date","Latitude","Longitude","Campus","Ognanization","LocationType","Steam Source ID","ChilledWSID","HotWTSID","ActivationDate")
 HackathonDataDaily = read.csv("HackathonDataDaily.csv")
-Hackathon_Data_Hourly2 = read.csv("HackathonDataHourly2of2.csv")
-Hackathon_Data_Hourly1 = read.csv("HackathonDataHourly1of2.csv")
+#Hackathon_Data_Hourly2 = read.csv("HackathonDataHourly2of2.csv")
+#Hackathon_Data_Hourly1 = read.csv("HackathonDataHourly1of2.csv")
 
 names(HackathonDataDaily) = c("meterID", "CurrentValue", "ValueString","Time","BuildingName","Units","Status","StatusCode")
-names(Hackathon_Data_Hourly2) = c("meterID", "CurrentValue", "ValueString","Time","BuildingName","Units","Status","StatusCode")
-names(Hackathon_Data_Hourly1) = c("meterID", "CurrentValue", "ValueString","Time","BuildingName","Units","Status","StatusCode")
+#names(Hackathon_Data_Hourly2) = c("meterID", "CurrentValue", #"ValueString","Time","BuildingName","Units","Status","StatusCode")
+#names(Hackathon_Data_Hourly1) = c("meterID", "CurrentValue", #"ValueString","Time","BuildingName","Units","Status","StatusCode")
 
-x1 = hack2019$X1102[,4]
+#x1 = hack2019$X1102[,4]
 
-renderTable({
-  head(hack2019, input$rows)
-})
+#renderTable({
+#  head(hack2019, input$rows)
+#})
 
 
 
@@ -70,23 +71,131 @@ It's also possible to embed an entire Shiny application within an R Markdown doc
 
 ```{r tabsets, echo=FALSE}
 electricity = hack2019%>%filter(hack2019$Resource == "Electricity")
-electricity_id = (electricity$`meeter ID`)
+electricity_id = (electricity$`meterID`)
+dataSize = dim(electricity)
+meterIdVec = rep(NA,dataSize[1])
+avgValueVec = rep(NA, dataSize[1])
+buildingTypeVec = rep(NA, dataSize[1])
+latVec =  rep(NA, dataSize[1])
+longVec =  rep(NA, dataSize[1])
 
-id1 = electricity_id[1]
-id1 = droplevels(id1)
-id1 = toString(id1)
-meterData = filter(HackathonDataDaily, meterID == id1)
-dataSize = dim(meterData)
-avgValue = (meterData[dataSize[1], 2] - meterData[1,2])/dataSize[1]
-avgElectricityData [1,1] = id1
-avgElectricityData [1,2] = avgValue
+for(i in 1:dataSize[1]) {
+id = electricity_id[i]
+id = droplevels(id)
+id = toString(id)
+meterData = filter(HackathonDataDaily, meterID == id)
+
+avgValue =((max(meterData[, 2])) - (min(meterData[,2])))/dataSize[1]
+idData = filter(hack2019, meterID == id)
+latVec[i] = idData[1,9]
+longVec[i] = idData[1,10]
+meterIdVec[i] = id
+avgValueVec[i] = avgValue
+}
+
 
 ```
 
+```{r, echo=FALSE}
+electricity_table = data.frame(meterIdVec, avgValueVec,longVec,latVec)
+names(electricity_table) <- c("MeterId", "Average", "Longitude", "Latitude")
+BlackBurn = filter(electricity_table, MeterId== "OSU_RTS.MDBUS_RH.1107_EC" )
+BlackBurnAvg = BlackBurn$Average
+BlackBurnAvg = BlackBurnAvg/132162
 
-```{r}
+Siebert = filter(electricity_table, MeterId== "OSU_RTS.MDBUS_RH.099_EC" )
+SiebertAvg = Siebert$Average
+SiebertAvg = SiebertAvg/85839
+
+
+
+
+
+```
+
+```{r, echo=FALSE}
+max.temp <- c(BlackBurnAvg,SiebertAvg )
+barplot(max.temp,xlab = "Building Name  and Construction Year",
+ylab = "Avg Electricity Consumption per sq feet",
+main="Student Housing Comparison",
+names.arg = c("Blackburn, 2016", "Siebert, 1957"),
+col = c("darkred","lightblue"))
+```
+
+```{r, echo=FALSE}
+electricity_table = data.frame(meterIdVec, avgValueVec,longVec,latVec)
+names(electricity_table) <- c("MeterId", "Average", "Longitude", "Latitude")
+CBEC = filter(electricity_table, MeterId== "OSU_RTS.MDBUS_E4.248_E01" )
+
+CBECAvg = CBEC$Average
+CBECAvg =CBECAvg/236537
+
+Orton = filter(electricity_table, MeterId== "OSU_RTS.MDBUS_E3.060_E01")
+OrtonAvg = Orton$Average
+OrtonAvg = OrtonAvg/41022
+
+
+
+
+
+```
+
+```{r, echo=FALSE}
+max2.temp <- c(CBECAvg,OrtonAvg )
+barplot(max2.temp,xlab = "Building Name and Construction Year",
+ylab = "Avg Electricity Consumption per sq feet",
+main="Academic Comparison",
+names.arg = c("CBEC, 2014", "Orton, 1893"),
+col = c("darkred","lightblue"), cex.main=1.7, cex.lab=1.5, cex.axis=0.75)
+```
+
+```{r, echo=FALSE}
 water = hack2019%>%filter(hack2019$Resource != "Electricity")
 ```
+
+
+
+
+
+
+
+```{r, echo=FALSE}
+water = hack2019%>%filter(hack2019$Resource != "Electricity")
+water = water%>%filter(water$meterID!="OSU_RTS.MDBUS_RT.274S_HF")
+water_id = (water$`meterID`)
+dataSize = dim(water)
+meterIdVecWater = rep(NA,dataSize[1])
+avgValueVecWater = rep(NA, dataSize[1])
+latVecWater =  rep(NA, dataSize[1])
+longVecWater =  rep(NA, dataSize[1])
+
+for(i in 1:dataSize[1]) {
+id = water_id[i]
+id = droplevels(id)
+id = toString(id)
+meterData = filter(HackathonDataDaily, meterID == id)
+
+avgValue = mean(meterData$CurrentValue)
+
+idData = filter(hack2019, meterID == id)
+latVecWater[i] = idData[1,9]
+longVecWater[i] = idData[1,10]
+meterIdVecWater[i] = id
+avgValueVecWater[i] = avgValue
+
+}
+
+water_table <- data.frame(avgValueVecWater,longVecWater, latVecWater,meterIdVecWater)
+water_table = na.omit(water_table)
+
+
+
+
+
+```
+
+
+
 
 Note the use of the `height` parameter to determine how much vertical space the embedded application should occupy.
 
@@ -95,7 +204,7 @@ You can also use the `shinyApp` function to define an application inline rather 
 In all of R code chunks above the `echo = FALSE` attribute is used. This is to prevent the R code within the chunk from rendering in the document alongside the Shiny components.
 
 
-```{r}
+```{r, echo=FALSE}
 
 APIkey1 = "AIzaSyBOzqqYlh8T2v9Km7TDjoIAFVq1U3CH4Bw"
 register_google(key = APIkey1)
@@ -113,8 +222,31 @@ map = ggmap(
 map + geom_point(aes(x = electricity$Longitude, y = electricity$Latitude, colors = electricity$Resource), data = electricity, alpha = .5, color="yellow")+scale_size(range=c(1,20))
 ```
 
+```{r}
+map
+```
+
+
+
+```{r, echo=FALSE}
+map + geom_point(aes(x = longVec, y = latVec, size= sqrt(avgValueVec)), data = electricity, alpha = .5, color="yellow")+scale_size(range=c(1,15)) + theme(legend.position = "none")
+```
+
+```{r, echo=FALSE}
+map + geom_point(aes(x = longVecWater, y = latVecWater, size= sqrt(avgValueVecWater)), data = water, alpha = .5, color="red")+scale_size(range=c(1,19)) + theme(legend.position = "none")
+```
+
+```{r,echo=FALSE}
+water_table <- data.frame(avgValueVecWater,longVecWater, latVecWater,meterIdVecWater)
+water_table = na.omit(water_table)
+average_cons = mean(water_table$avgValueVecWater)
+
+
+```
+
 
 ```{r}
-map + geom_point(aes(x = water$Longitude, y = water$Latitude, colors = water$Resource), data = water, alpha = .5, color="red")+scale_size(range=c(1,20))
+x = c(33/354,(354-33)/354)
+pie(x, col = NULL, family="Courier")
 ```
 
